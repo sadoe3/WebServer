@@ -37,13 +37,6 @@ migrated from a static Jekyll/GitHub Pages site and rebuilt as a dynamic web ser
 
 ## Features
 
-### Content (F-01)
-- Scans `content/` recursively on startup and caches all posts in memory
-- Parses Jekyll-style YAML frontmatter (`title`, `date`, `tags`, etc.)
-- URL scheme: `/posts/{category}/{slug}?lang=en|kr`
-- KR fallback: requesting `?lang=kr` on an EN-only post silently serves EN
-- Math regions (`$...$`, `$$...$$`) are extracted before markdown processing to prevent HTML-encoding corruption, then restored for KaTeX
-
 ### Auth & Access Control (F-02)
 - **Fully closed** — global middleware guards every route; unauthenticated requests are redirected to `/login`
 - **Role-based:** `admin` (full access) vs `viewer` (read-only). Only registered users in the DB can log in.
@@ -57,17 +50,20 @@ migrated from a static Jekyll/GitHub Pages site and rebuilt as a dynamic web ser
 - New users can receive an invite email automatically on creation
 - Self-delete guard — admins cannot delete their own account
 
+### Content (F-01)
+- Scans `content/` recursively on startup and caches all posts in memory
+- Parses Jekyll-style YAML frontmatter (`title`, `date`, `tags`, etc.)
+- URL scheme: `/posts/{category}/{slug}?lang=en|kr`
+- KR fallback: requesting `?lang=kr` on an EN-only post silently serves EN
+- Math regions (`$...$`, `$$...$$`) are extracted before markdown processing to prevent HTML-encoding corruption, then restored for KaTeX
+
 ### Database (F-03)
 - Three tables: `users`, `magic_tokens`, `sessions`
 - Auto-created on first run (`CREATE TABLE IF NOT EXISTS`)
 - Background task cleans up expired tokens every hour
 
-### Deployment (F-04)
-- **Quick Tunnel (free):** `cloudflared tunnel --url http://localhost:8080` — temporary `*.trycloudflare.com` URL, changes on restart
-- **Named Tunnel (~$10/yr):** Fixed custom domain via `cloudflared/config.yml`
-
 ### UI/UX (Phase 5)
-- Dark / light mode toggle — preference stored server-side (`app.storage.user`), applied before first render to eliminate flash
+- Dark mode by default — preference stored server-side, applied before first render to eliminate flash
 - Pill-style EN/KR language toggle on every post
 - Floating "↑" back-to-top button (appears after 300 px scroll)
 - Bottom navigation bar mirrors the top — no scrolling back up to switch language or go home
@@ -75,10 +71,14 @@ migrated from a static Jekyll/GitHub Pages site and rebuilt as a dynamic web ser
 
 ### Reading Experience (Phase 7)
 - **Table of Contents sidebar** — sticky right-side panel parsing h2/h3/h4 headings; auto-expands when heading count > 10; hidden on narrow viewports
-- **Scroll-based section highlighting** — active heading tracked via scroll event (not IntersectionObserver) for reliable highlight that never drops
+- **Scroll-based section highlighting** — active heading tracked via scroll event for reliable highlight that never drops
 - **Section separators** — `border-top` divider before each `h2`; left accent bars on `h3` (blue) and `h4` (light blue) for visual hierarchy
 - **Pretendard font** — variable font via CDN, optimized for both Korean and Latin; applied globally
-- **Korean bold fix** — markdown2 word-boundary bug with Hangul (`**text**가` failing) resolved by inserting U+200B at CJK↔`**` boundaries before rendering; covers all KR posts automatically
+- **Korean bold fix** — markdown2 word-boundary bug with Korean text (`**text**가` failing) resolved by inserting U+200B at Korean↔`**` boundaries before rendering; covers all KR posts automatically
+
+### Deployment (F-04)
+- **Quick Tunnel (free):** `cloudflared tunnel --url http://localhost:8080` — temporary `*.trycloudflare.com` URL, changes on restart
+- **Named Tunnel (~$10/yr):** Fixed custom domain via `cloudflared/config.yml`
 
 ---
 

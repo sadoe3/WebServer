@@ -15,5 +15,8 @@ wheels/
 # Database
 data/
 
+# NiceGUI server-side user storage (session preferences, not source code)
+.nicegui/
+
 # Test scripts
 test_*.py
