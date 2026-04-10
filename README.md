@@ -37,39 +37,39 @@ migrated from a static Jekyll/GitHub Pages site and rebuilt as a dynamic web ser
 
 ## Features
 
-### Auth & Access Control (F-02)
+### Auth & Access Control
 - **Fully closed** — global middleware guards every route; unauthenticated requests are redirected to `/login`
 - **Role-based:** `admin` (full access) vs `viewer` (read-only). Only registered users in the DB can log in.
 - Magic link flow: email input → DB lookup → one-time UUID token (15 min) → SMTP → cookie session
 - `HttpOnly; Secure; SameSite=Lax` session cookie; token is single-use
 - Initial admin seeded from `ADMIN_EMAIL` in `.env` on first run
 
-### User Management (F-05)
+### User Management
 - Admin panel (`/admin`) lists all users with their roles
 - Add users (email + role), change roles, delete users
 - New users can receive an invite email automatically on creation
 - Self-delete guard — admins cannot delete their own account
 
-### Content (F-01)
+### Content
 - Scans `content/` recursively on startup and caches all posts in memory
 - Parses Jekyll-style YAML frontmatter (`title`, `date`, `tags`, etc.)
 - URL scheme: `/posts/{category}/{slug}?lang=en|kr`
 - KR fallback: requesting `?lang=kr` on an EN-only post silently serves EN
 - Math regions (`$...$`, `$$...$$`) are extracted before markdown processing to prevent HTML-encoding corruption, then restored for KaTeX
 
-### Database (F-03)
+### Database
 - Three tables: `users`, `magic_tokens`, `sessions`
 - Auto-created on first run (`CREATE TABLE IF NOT EXISTS`)
 - Background task cleans up expired tokens every hour
 
-### UI/UX (Phase 5)
+### UI/UX
 - Dark mode by default — preference stored server-side, applied before first render to eliminate flash
 - Pill-style EN/KR language toggle on every post
 - Floating "↑" back-to-top button (appears after 300 px scroll)
 - Bottom navigation bar mirrors the top — no scrolling back up to switch language or go home
 - Post typography: line height, heading margins, inline code, blockquote, image styles
 
-### Reading Experience (Phase 7)
+### Reading Experience
 - **Table of Contents sidebar** — sticky right-side panel parsing h2/h3/h4 headings; auto-expands when heading count > 10; hidden on narrow viewports
 - **Scroll-based section highlighting** — active heading tracked via scroll event for reliable highlight that never drops
 - **Section separators** — `border-top` divider before each `h2`; left accent bars on `h3` (blue) and `h4` (light blue) for visual hierarchy
