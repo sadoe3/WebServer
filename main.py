@@ -15,6 +15,7 @@ load_dotenv()
 HOST = os.getenv("HOST", "0.0.0.0")
 PORT = int(os.getenv("PORT", "8080"))
 SESSION_EXPIRE_DAYS = int(os.getenv("SESSION_EXPIRE_DAYS", "7"))
+STORAGE_SECRET = os.getenv("STORAGE_SECRET", "changeme-storage-secret")
 
 posts = load_posts()
 
@@ -74,4 +75,4 @@ def admin(request: Request):
     return admin_page.render(request)
 
 
-ui.run(host=HOST, port=PORT)
+ui.run(host=HOST, port=PORT, storage_secret=STORAGE_SECRET)

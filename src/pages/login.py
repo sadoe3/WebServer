@@ -2,13 +2,15 @@ import os
 from nicegui import ui
 from src.auth import create_magic_token
 from src.mail import send_magic_link
+from src import layout
 
 
 def render() -> None:
+    layout.page_header()
     admin_email = os.getenv("ADMIN_EMAIL", "")
     expire_minutes = int(os.getenv("TOKEN_EXPIRE_MINUTES", "15"))
 
-    with ui.column().classes("w-full max-w-md mx-auto mt-20 p-6 gap-4"):
+    with ui.column().classes("w-full max-w-md mx-auto mt-16 p-6 gap-4"):
         ui.label("Admin Login").classes("text-2xl font-bold")
         email_input = ui.input("Email").classes("w-full")
         status = ui.label("").classes("text-sm")
