@@ -1,5 +1,15 @@
 from nicegui import app, ui
 
+# Pretendard: best variable font for Korean + Latin portfolio sites
+PRETENDARD_CSS = "https://cdn.jsdelivr.net/gh/orioncactus/pretendard@v1.3.9/dist/web/variable/pretendardvariable-dynamic-subset.css"
+FONT_STYLE = (
+    "<style>"
+    "*, *::before, *::after { box-sizing: border-box; }"
+    "body, .q-app { font-family: 'Pretendard Variable', Pretendard, "
+    "-apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif !important; }"
+    "</style>"
+)
+
 KATEX_CSS = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.css"
 KATEX_JS = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/katex.min.js"
 KATEX_AUTO = "https://cdn.jsdelivr.net/npm/katex@0.16.11/dist/contrib/auto-render.min.js"
@@ -16,8 +26,12 @@ def page_header(with_code_math: bool = False) -> None:
     """
     # Read preference server-side so dark.value is set before HTML is sent to browser.
     # This eliminates the flash: Quasar initialises with the correct state from the start.
-    is_dark: bool = app.storage.user.get("dark_mode", False)
+    is_dark: bool = app.storage.user.get("dark_mode", True)
     dark = ui.dark_mode(value=is_dark)
+
+    # Load Pretendard font (Korean + Latin) on every page
+    ui.add_head_html(f'<link rel="stylesheet" href="{PRETENDARD_CSS}">')
+    ui.add_head_html(FONT_STYLE)
 
     if with_code_math:
         ui.add_head_html(f'<link rel="stylesheet" href="{KATEX_CSS}">')
@@ -30,26 +44,31 @@ def page_header(with_code_math: bool = False) -> None:
 
     async def _on_page_load() -> None:
         if with_code_math:
-            await ui.run_javascript(
-                'if (typeof hljs !== "undefined") { hljs.highlightAll(); }'
-            )
-            # NiceGUI injects markdown via WebSocket after DOMContentLoaded,
-            # so KaTeX auto-render must be triggered manually here
-            await ui.run_javascript(
-                'if (typeof renderMathInElement !== "undefined") {'
-                '  renderMathInElement(document.body, {'
-                '    delimiters: ['
-                '      {left: "$$", right: "$$", display: true},'
-                '      {left: "$",  right: "$",  display: false}'
-                '    ],'
-                '    throwOnError: false'
-                '  });'
-                '}'
-            )
+            try:
+                await ui.run_javascript(
+                    'if (typeof hljs !== "undefined") { hljs.highlightAll(); }',
+                    timeout=5.0,
+                )
+                # NiceGUI injects markdown via WebSocket after DOMContentLoaded,
+                # so KaTeX auto-render must be triggered manually here
+                await ui.run_javascript(
+                    'if (typeof renderMathInElement !== "undefined") {'
+                    '  renderMathInElement(document.body, {'
+                    '    delimiters: ['
+                    '      {left: "$$", right: "$$", display: true},'
+                    '      {left: "$",  right: "$",  display: false}'
+                    '    ],'
+                    '    throwOnError: false'
+                    '  });'
+                    '}',
+                    timeout=5.0,
+                )
+            except TimeoutError:
+                pass  # client disconnected or navigated away before scripts loaded
 
     # Timer is now only needed for hljs + KaTeX (dark mode no longer requires it)
     if with_code_math:
-        ui.timer(0.3, _on_page_load, once=True)
+        ui.timer(0.5, _on_page_load, once=True)
 
     async def _toggle_dark() -> None:
         dark.toggle()

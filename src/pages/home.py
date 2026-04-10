@@ -40,8 +40,9 @@ def render(posts: list[Post]) -> None:
                         kr_post = langs.get("kr")
                         display = en_post or kr_post
 
+                        title_href = f"/posts/{category}/{slug}?lang=en" if en_post else f"/posts/{category}/{slug}?lang=kr"
                         with ui.row().classes("items-center gap-3 py-2 px-2 rounded hover:bg-gray-50 dark:hover:bg-gray-800 w-full"):
-                            ui.label(display.title).classes("flex-1 text-sm font-medium")
+                            ui.link(display.title, title_href).classes("flex-1 text-sm font-medium text-inherit no-underline hover:text-blue-500 transition-colors")
                             ui.label(display.date).classes("text-xs text-gray-400 shrink-0")
                             with ui.row().classes("gap-1 shrink-0"):
                                 if en_post:

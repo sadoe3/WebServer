@@ -73,6 +73,13 @@ migrated from a static Jekyll/GitHub Pages site and rebuilt as a dynamic web ser
 - Bottom navigation bar mirrors the top — no scrolling back up to switch language or go home
 - Post typography: line height, heading margins, inline code, blockquote, image styles
 
+### Reading Experience (Phase 7)
+- **Table of Contents sidebar** — sticky right-side panel parsing h2/h3/h4 headings; auto-expands when heading count > 10; hidden on narrow viewports
+- **Scroll-based section highlighting** — active heading tracked via scroll event (not IntersectionObserver) for reliable highlight that never drops
+- **Section separators** — `border-top` divider before each `h2`; left accent bars on `h3` (blue) and `h4` (light blue) for visual hierarchy
+- **Pretendard font** — variable font via CDN, optimized for both Korean and Latin; applied globally
+- **Korean bold fix** — markdown2 word-boundary bug with Hangul (`**text**가` failing) resolved by inserting U+200B at CJK↔`**` boundaries before rendering; covers all KR posts automatically
+
 ---
 
 ## Project Structure
