@@ -5,9 +5,9 @@ from fastapi import Request
 from fastapi.responses import RedirectResponse
 from nicegui import app, ui
 
-from src.db import init_db, cleanup_expired
+from src.db import init_db, seed_admin, cleanup_expired
 from src.content import load_posts
-from src.auth import verify_magic_token
+from src.auth import verify_magic_token, get_session_user
 from src.pages import home, post as post_page, login as login_page, admin as admin_page
 
 load_dotenv()
@@ -19,6 +19,23 @@ STORAGE_SECRET = os.getenv("STORAGE_SECRET", "changeme-storage-secret")
 
 posts = load_posts()
 
+# Paths that do not require authentication
+_PUBLIC_PREFIXES = ("/login", "/auth/verify", "/_nicegui/")
+
+
+@app.middleware("http")
+async def auth_middleware(request: Request, call_next):
+    path = request.url.path
+    if any(path.startswith(p) for p in _PUBLIC_PREFIXES):
+        return await call_next(request)
+
+    session_token = request.cookies.get("session_id")
+    user = get_session_user(session_token) if session_token else None
+    if user is None:
+        return RedirectResponse("/login", status_code=302)
+
+    return await call_next(request)
+
 
 async def _cleanup_loop() -> None:
     while True:
@@ -29,6 +46,7 @@ async def _cleanup_loop() -> None:
 @app.on_startup
 async def startup() -> None:
     init_db()
+    seed_admin()
     asyncio.create_task(_cleanup_loop())
 
 
